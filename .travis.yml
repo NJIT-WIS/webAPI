@@ -26,8 +26,7 @@ before_script:
 
 - php artisan serve > /dev/null 2>&1 &
 - composer self-update
-
-# - pear install pear/PHP_CodeSniffer
+#- pear install pear/PHP_CodeSniffer
 - phpenv rehash
 - nvm install 7.7.1
 - npm install npm@latest -g
@@ -37,9 +36,7 @@ before_script:
 
 
 script:
-
 - php artisan dusk
-
 - vendor/bin/phpunit --coverage-text
 
 # - phpcs --ignore=app/Http/Controllers/Auth,app/Http/Controllers/Controller.php app/Http/Controllers
