@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Events\LogInEvent;
 
 use Tests\TestCase;
 
@@ -32,10 +33,9 @@ class LoginTest extends TestCase
     public function testRequiresEmailAndLoginTest()
     {
         $this->json('POST', 'api/login')
-            ->assertStatus(401)
-            ->assertJson([
-                'success' => "false",
-                'message' => "Invalid Email or Password",
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'email',
             ]);
     }
 
@@ -50,8 +50,26 @@ class LoginTest extends TestCase
             ->assertStatus(200)
             ->assertJsonStructure(
                 [
-                    'success',
+                    'code',
+                    'status',
+                    'message',
                     'token',
+                ]
+            );
+    }
+
+    public function testUserLoginFailure()
+    {
+        $this->expectsEvents(LogInEvent::class);
+
+        $payload = ['email' => 'wrongemail@wrongemail.com', 'password' => 'password'];
+        $this->json('POST', 'api/login', $payload)
+            ->assertStatus(401)
+            ->assertJsonStructure(
+                [
+                    'code',
+                    'status',
+                    'message',
                 ]
             );
     }
